@@ -34,7 +34,7 @@ def home():
 def submit_form(data: Customer):
     print("data",data)
     # n8n webhook URL
-    n8n_webhook_url = "https://hypochloremic-carlita-allopatrically.ngrok-free.dev/webhook-test/sales-call"
+    n8n_webhook_url = "https://hypochloremic-carlita-allopatrically.ngrok-free.dev/webhook/sales-call"
 
     payload = {
         "customerName": data.customerName,
