@@ -1,21 +1,20 @@
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 
-# Create FastAPI app
 app = FastAPI()
 
-# Enable CORS (Important for React frontend)
+# CORS (OK for now, restrict later)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with frontend URL
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Request body model
 class Customer(BaseModel):
     customerName: str
     phone: str
@@ -23,18 +22,17 @@ class Customer(BaseModel):
     language: str
 
 
-# Test route
 @app.get("/")
 def home():
     return {"message": "FastAPI Backend Running Successfully 🚀"}
 
 
-# Form submit route
 @app.post("/submit")
 def submit_form(data: Customer):
-    print("data",data)
-    # n8n webhook URL
-    n8n_webhook_url = "https://hypochloremic-carlita-allopatrically.ngrok-free.dev/webhook/sales-call"
+    print("Received data:", data)
+
+    # ✅ Production n8n webhook URL
+    n8n_webhook_url = "https://n8n-1-xw0r.onrender.com/webhook/sales-call"
 
     payload = {
         "customerName": data.customerName,
@@ -44,15 +42,25 @@ def submit_form(data: Customer):
     }
 
     try:
-        response = requests.post(n8n_webhook_url, json=payload)
+        # ✅ Add timeout (important)
+        response = requests.post(
+            n8n_webhook_url,
+            json=payload,
+            timeout=10
+        )
+
+        print("n8n status:", response.status_code)
+        print("n8n response:", response.text)
 
         return {
             "status": "success",
-            "message": "Data sent to n8n successfully",
+            "n8n_status": response.status_code,
             "n8n_response": response.text
         }
 
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
+        print("Error:", str(e))
+
         return {
             "status": "error",
             "message": str(e)
