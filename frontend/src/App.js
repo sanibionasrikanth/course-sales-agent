@@ -21,7 +21,7 @@ function App() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8000/submit", formData);
+      await axios.post("https://course-sales-agent.onrender.com/submit", formData);
       alert("Form Submitted Successfully!");
 
       setFormData({
